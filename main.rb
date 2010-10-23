@@ -1,4 +1,4 @@
-# WebSocket echo server
+# WebSocket main server
 
 require 'rubygems'
 require 'rev/websocket'
@@ -70,7 +70,7 @@ host = '0.0.0.0'
 #host = '192.168.1.192'
 port = ARGV[0] || 8081
 
-  config = { :initial_filename => "csa.init",
+  config = { :initial_filename => "csa/csa.init",
              :opponent => "skkmania",
              :sente => false,
              :black => "skkmania", 

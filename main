@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 fork {
-	load 'echo.rb'
+	load 'main.rb'
 	exit 0
 }
 

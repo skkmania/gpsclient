@@ -51,10 +51,28 @@
 			debug("message received: "+event.data);
 			$("#message").append("<p>"+event.data+"</p>");
 		}
+
+		function sendMessage(data) {
+			ws.send(data);
+		}
+
+		global.submitMessage = function() {
+			var input = $("#input");
+			if(input.val() != "") {
+        ws.send(input.val() + "\n");
+				input.val("");
+			}
+			return false;
+		}
 	});
 	</script>
 </head>
 <body>
+	<div id="control">
+		<form action="#" onsubmit="return submitMessage();">
+			<input type="text" name="input" id="input" value="input move!" />
+		</form>
+	</div>
 	<div id="message"></div>
 	<div id="debug"></div>
 </body>

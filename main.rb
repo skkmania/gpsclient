@@ -66,38 +66,50 @@ class EchoConnection < Rev::WebSocket
 	end
 end
 
-host = '0.0.0.0'
-#host = '192.168.1.192'
-port = ARGV[0] || 8081
-
-  config = { :initial_filename => "csa/csa.init",
-             :opponent => "skkmania",
-             :sente => false,
-             :black => "skkmania", 
-             :white => "gps",
-             :limit => 1600, 
-             :table_size => 30000,
-             :table_record_limit => 50,
-             :node_limit => 16000000,
-             :timeleft => 100, 
-             :byoyomi => 60,
-             :logfile_basename => "logs/x1_",
-             :other_options => "",
-             :base_command => '/usr/games/gpsshogi -v -c'
-           }
-$prog = GpsShogi.new(config)
-Thread.start {
-  while 1 do
-    res = $prog.read
-    puts "Thread data received: '#{res}'"
-    $pubsub.publish(res)
+class ShogiProgram
+  def initialize
+    @config = { :initial_filename => "csa/csa.init",
+                :opponent => "skkmania",
+                :sente => false,
+                :black => "skkmania", 
+                :white => "gps",
+                :limit => 1600, 
+                :table_size => 30000,
+                :table_record_limit => 50,
+                :node_limit => 16000000,
+                :timeleft => 100, 
+                :byoyomi => 60,
+                :logfile_basename => "logs/x1_",
+                :other_options => "",
+                :base_command => '/usr/games/gpsshogi -v -c'
+             }
+    $prog = GpsShogi.new(@config)
   end
-}
-$server = Rev::WebSocketServer.new(host, port, EchoConnection)
-$server.attach(Rev::Loop.default)
-$pubsub.publish("this connection was attached to WebSocketServer")
 
-puts "start on #{host}:#{port}"
+  def play
+    Thread.start {
+      loop do
+        res = $prog.read
+        puts "Thread data received: '#{res}'"
+        $pubsub.publish(res)
+      end
+    }
+  end
+end
 
-Rev::Loop.default.run
+def main
+  host = '0.0.0.0'
+  port = ARGV[0] || 8081
 
+  ShogiProgram.new.play
+
+  $server = Rev::WebSocketServer.new(host, port, EchoConnection)
+  $server.attach(Rev::Loop.default)
+
+  $pubsub.publish("this connection was attached to WebSocketServer")
+  
+  puts "start on #{host}:#{port}"
+  Rev::Loop.default.run
+end
+
+main

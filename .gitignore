@@ -1,3 +1,7 @@
 logs/*.*
 logs
 csa/
+*.swp
+*.log
+*.bak
+*~
